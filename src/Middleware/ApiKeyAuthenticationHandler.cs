@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using WebAppAuthentication;
 
 namespace WebAppAuthentication2.Middleware
 {
@@ -21,18 +22,22 @@ namespace WebAppAuthentication2.Middleware
         {
         }
 
-        protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             // skip authentication if endpoint has [AllowAnonymous] attribute
             var endpoint = Context.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
-                return AuthenticateResult.NoResult();
+            {
+                return Task.FromResult(AuthenticateResult.NoResult());
+            }
 
             if (!Request.Headers.ContainsKey("x-api-key"))
-                return AuthenticateResult.Fail("Missing ApiKey Header");
+            {
+                return Task.FromResult(AuthenticateResult.Fail("Missing ApiKey Header"));
+            }
 
             var givenKey = Request.Headers["x-api-key"];
-            if (givenKey == "123456789")
+            if (givenKey == Constants.ApiKeySection.API_KEY)
             {
                 var claims = new[] {
                     new Claim(ClaimTypes.Actor, Guid.NewGuid().ToString())
@@ -41,10 +46,10 @@ namespace WebAppAuthentication2.Middleware
                 var principal = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-                return AuthenticateResult.Success(ticket);
+                return Task.FromResult(AuthenticateResult.Success(ticket));
             }
 
-            return AuthenticateResult.Fail("Invalid api key");
+            return Task.FromResult(AuthenticateResult.Fail("Invalid api key"));
         }
     }
 }

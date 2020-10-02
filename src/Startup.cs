@@ -1,10 +1,16 @@
-using Microsoft.AspNetCore.Authentication;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WebAppAuthentication2.Middleware;
+using Microsoft.IdentityModel.Tokens;
+using WebAppAuthentication.Configuration;
+using WebAppAuthentication.Database;
+using WebAppAuthentication.Models;
 using WebAppAuthentication2.Services;
 
 namespace WebAppAuthentication2
@@ -23,9 +29,38 @@ namespace WebAppAuthentication2
         {
             services.AddScoped<IUserService, UserService>();
 
-            services.AddAuthentication("BasicAuthentication")
-                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null)
-                .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKeyAuthentication", null);
+            services.Configure<JwtAuthenticationConfig>(Configuration.GetSection("JwtAuthentication"));
+
+            services.AddDbContext<JwtAuthenticationDbContext>(options =>
+                            options.UseSqlServer(Configuration.GetConnectionString("SqlDatabase")));
+
+            services.AddIdentity<AppUser, IdentityRole>()
+                        .AddEntityFrameworkStores<JwtAuthenticationDbContext>()
+                        .AddDefaultTokenProviders();
+
+            services.AddAuthentication(
+                options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                //.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(Constants.BasicAuthSection.AUTHENTICATION_SCHEME, null)
+                //.AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(Constants.ApiKeySection.AUTHENTICATION_SCHEME, null)
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        //ValidAudience = Configuration["JwtAuthentication:ValidAudience"],
+                        //ValidIssuer = Configuration["JwtAuthentication:ValidIssuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtAuthentication:Secret"]))
+                    };
+                });
+
             services.AddControllers();
         }
 

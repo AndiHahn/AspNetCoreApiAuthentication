@@ -1,22 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebAppAuthentication;
 
 namespace WebAppAuthentication2.Controllers
 {
-    [Authorize(AuthenticationSchemes = "BasicAuthentication")]
+    [Authorize(AuthenticationSchemes = Constants.ApiKeySection.AUTHENTICATION_SCHEME)]
     [Route("api/[controller]")]
     [ApiController]
-    public class BasicAuthController : ControllerBase
+    public class ApiKeyTestController : ControllerBase
     {
-        public BasicAuthController()
-        {
-
-        }
-
         [HttpGet]
         public string HelloWorld()
         {
-            return "Basic Auth successful";
+            return "ApiKey Auth successful";
         }
     }
 }
