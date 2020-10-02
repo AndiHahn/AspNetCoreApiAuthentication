@@ -1,4 +1,4 @@
-﻿namespace WebAppAuthentication2.Models
+﻿namespace WebAppAuthentication.Models
 {
     public class User
     {

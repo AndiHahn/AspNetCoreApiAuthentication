@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebAppAuthentication;
 
-namespace WebAppAuthentication2.Middleware
+namespace WebAppAuthentication.Middleware
 {
     public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {

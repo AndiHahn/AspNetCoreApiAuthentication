@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebAppAuthentication2.Models;
+using WebAppAuthentication.Models;
 
-namespace WebAppAuthentication2.Services
+namespace WebAppAuthentication.Services
 {
     public class UserService : IUserService
     {

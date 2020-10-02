@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebAppAuthentication;
 
-namespace WebAppAuthentication2.Controllers
+namespace WebAppAuthentication.Controllers
 {
     [Authorize(AuthenticationSchemes = Constants.ApiKeySection.AUTHENTICATION_SCHEME)]
     [Route("api/[controller]")]

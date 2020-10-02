@@ -9,10 +9,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using WebAppAuthentication2.Models;
-using WebAppAuthentication2.Services;
+using WebAppAuthentication.Models;
+using WebAppAuthentication.Services;
 
-namespace WebAppAuthentication2.Middleware
+namespace WebAppAuthentication.Middleware
 {
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {

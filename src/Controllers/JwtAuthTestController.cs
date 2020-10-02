@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebAppAuthentication.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = Constants.JwtAuthSection.AUTHENTICATION_SCHEME)]
     [Route("api/[controller]")]
     [ApiController]
     public class JwtAuthTestController : ControllerBase
     {
-        //[Authorize(Roles = Constants.JwtAuthSection.UserRoles.User)]
+        [Authorize(Roles = Constants.JwtAuthSection.UserRoles.User)]
         [HttpGet("userrole")]
         public string HelloWorldUserRole()
         {
             return "Successfully called method with user role";
         }
 
-        //[Authorize(Roles = Constants.JwtAuthSection.UserRoles.Admin)]
+        [Authorize(Roles = Constants.JwtAuthSection.UserRoles.Admin)]
         [HttpGet("adminrole")]
         public string HelloWorldAdminRole()
         {

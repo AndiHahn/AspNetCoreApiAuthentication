@@ -5,7 +5,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -91,10 +90,18 @@ namespace WebAppAuthentication.Controllers
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                IEnumerable<string> errors = result?.Errors.Select(e => e.Description);
+                return BadRequest(errors);
             }
 
-            return NoContent();
+            if (!await roleManager.RoleExistsAsync(Constants.JwtAuthSection.UserRoles.User))
+            {
+                await roleManager.CreateAsync(new IdentityRole(Constants.JwtAuthSection.UserRoles.User));
+            }
+
+            await userManager.AddToRoleAsync(user, Constants.JwtAuthSection.UserRoles.User);
+
+            return Ok("Successfully created user.");
         }
 
         [HttpPost("createadmin")]
@@ -130,9 +137,10 @@ namespace WebAppAuthentication.Controllers
                 await roleManager.CreateAsync(new IdentityRole(Constants.JwtAuthSection.UserRoles.User));
             }
 
+            await userManager.AddToRoleAsync(user, Constants.JwtAuthSection.UserRoles.User);
             await userManager.AddToRoleAsync(user, Constants.JwtAuthSection.UserRoles.Admin);
 
-            return NoContent();
+            return Ok("Successfully created admin.");
         }
     }
 }
